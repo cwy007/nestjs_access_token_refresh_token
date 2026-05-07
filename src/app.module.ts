@@ -4,9 +4,15 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { authPlugins } from 'mysql2';
 import { UserModule } from './user/user.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
+    JwtModule.register({
+      global: true,
+      secret: 'your_jwt_secret',
+      signOptions: { expiresIn: '30m' },
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
