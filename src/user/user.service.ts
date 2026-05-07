@@ -12,6 +12,25 @@ export class UserService {
   @InjectEntityManager()
   private readonly entityManager: EntityManager;
 
+  async register(createUserDto: CreateUserDto) {
+    const existingUser = await this.entityManager.findOne(User, {
+      where: {
+        username: createUserDto.username,
+      },
+    });
+
+    if (existingUser) {
+      throw new HttpException('用户名已存在', 400);
+    }
+
+    const user = new User();
+    user.username = createUserDto.username;
+    user.password = createUserDto.password;
+    await this.entityManager.save(User, user);
+
+    return user;
+  }
+
   async login(userLoginDto: UserLoginDto) {
     const user = await this.entityManager.findOne(User, {
       where: {
@@ -30,22 +49,11 @@ export class UserService {
     return user;
   }
 
-  async register(createUserDto: CreateUserDto) {
-    const existingUser = await this.entityManager.findOne(User, {
+  async findUserById(id: number) {
+    return await this.entityManager.findOne(User, {
       where: {
-        username: createUserDto.username,
+        id,
       },
     });
-
-    if (existingUser) {
-      throw new HttpException('用户名已存在', 400);
-    }
-
-    const user = new User();
-    user.username = createUserDto.username;
-    user.password = createUserDto.password;
-    await this.entityManager.save(User, user);
-
-    return user;
   }
 }
